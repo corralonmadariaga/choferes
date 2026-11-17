@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Choferes · Corralón Municipal de Lanús</title>
+<style>
+:root{
+  --azul:#1a3a5c;--azul-m:#2c5f8a;--azul-c:#d6e8f7;
+  --verde:#2d6a4f;--naranja:#e07b2a;--gris:#f4f6f9;
+  --borde:#c8d4e0;--texto:#1a2533;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--gris);color:var(--texto);font-size:15px;}
+button{font-family:inherit;}
+
+.top{position:sticky;top:0;z-index:200;}
+.hdr{background:#fff;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;box-shadow:0 2px 8px rgba(0,0,0,.08);border-bottom:3px solid var(--naranja);}
+.hdr h1{font-size:16px;font-weight:700;color:var(--azul);}
+.hdr p{font-size:11.5px;color:#556;margin-top:2px;}
+.hdr-tag{background:var(--azul-c);color:var(--azul);border-radius:6px;padding:5px 10px;font-size:12px;font-weight:700;white-space:nowrap;}
+.tabs{display:flex;background:var(--azul);overflow-x:auto;scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{flex:1 0 auto;min-height:48px;padding:0 16px;background:none;border:none;border-bottom:3px solid transparent;color:rgba(255,255,255,.72);font-size:13.5px;font-weight:600;white-space:nowrap;}
+.tab[aria-selected="true"]{color:#fff;border-bottom-color:var(--naranja);background:rgba(255,255,255,.1);}
+
+.content{padding:14px;max-width:900px;margin:0 auto;padding-bottom:40px;}
+.card{background:#fff;border-radius:8px;border:1px solid var(--borde);padding:14px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.05);}
+.card-title{font-size:12.5px;font-weight:700;color:var(--azul);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;padding-bottom:7px;border-bottom:2px solid var(--azul-c);}
+
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+.full{grid-column:1/-1;}
+@media(max-width:600px){.fg{grid-template-columns:1fr;} .fg.keep2{grid-template-columns:1fr 1fr;}}
+label{display:block;font-size:13px;font-weight:600;color:#334;margin-bottom:4px;}
+select,input[type=text],input[type=email],input[type=password],input[type=date],input[type=search],textarea{width:100%;min-height:46px;padding:9px 10px;border:1px solid #8fa3b8;border-radius:6px;font-size:16px;background:#fff;color:var(--texto);font-family:inherit;}
+select:focus,input:focus,textarea:focus{outline:none;border-color:var(--azul-m);box-shadow:0 0 0 3px rgba(44,95,138,.15);}
+textarea{resize:vertical;}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:46px;padding:0 16px;border:none;border-radius:6px;font-size:14.5px;font-weight:700;cursor:pointer;}
+.btn-p{background:var(--azul);color:#fff;}
+.btn-s{background:var(--verde);color:#fff;}
+.btn-o{background:#fff;color:var(--azul);border:1.5px solid var(--azul);}
+.btn-d{background:#fff;color:#b32d20;border:1.5px solid #b32d20;}
+.btn-d.conf{background:#b32d20;color:#fff;}
+.btn-x{min-height:44px;min-width:44px;padding:0;background:#fff;color:#b32d20;border:1.5px solid #e2b6b1;border-radius:6px;font-size:16px;font-weight:700;}
+.btn-block{display:flex;width:100%;}
+.row{display:flex;gap:8px;align-items:center;}
+.row.wrap{flex-wrap:wrap;}
+.grow{flex:1;min-width:0;}
+
+.badge{display:inline-block;padding:2px 9px;border-radius:12px;font-size:11.5px;font-weight:700;white-space:nowrap;}
+.b-d1{background:#dbeafe;color:#1e40af;} .b-d2{background:#e0f2fe;color:#075985;} .b-d3{background:#fef3c7;color:#92400e;} .b-d4{background:#ede9fe;color:#6d28d9;}
+.b-ok{background:#d4edda;color:#1a5c2e;} .b-taller{background:#fff3cd;color:#7a5c00;} .b-fuera{background:#fee2e2;color:#991b1b;}
+.tag{font-size:12px;color:#556;display:block;margin-top:3px;}
+.tag.hoy{color:var(--azul-m);font-weight:600;}
+.tag.warn{color:#b32d20;font-weight:700;}
+.tag.info{color:#8a5a00;font-weight:600;}
+
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;}
+.stat{background:#fff;border:1px solid var(--borde);border-radius:7px;padding:8px 4px;text-align:center;}
+.stat .n{font-size:21px;font-weight:800;color:var(--azul);} .stat .l{font-size:10px;color:#556;text-transform:uppercase;}
+@media(max-width:420px){.stat .l{font-size:9px;}}
+
+.kard{display:block;width:100%;text-align:left;background:#fff;border:1px solid var(--borde);border-radius:7px;padding:10px 12px;margin-bottom:8px;color:var(--texto);cursor:pointer;}
+.kard.ok{border-left:4px solid var(--verde);} .kard.taller{border-left:4px solid #e0a938;} .kard.fuera{border-left:4px solid #b32d20;}
+.kard b{font-size:15px;}
+.sub{font-size:13px;color:#556;margin-top:2px;}
+.sec-head{color:#fff;padding:7px 12px;border-radius:5px;display:flex;justify-content:space-between;font-weight:700;font-size:12px;margin:14px 0 7px;}
+.sub-head{font-size:12.5px;font-weight:700;color:var(--azul);margin:10px 0 6px;padding-left:8px;border-left:4px solid var(--azul-c);}
+.item{border:1px solid var(--borde);border-radius:7px;padding:9px 10px;margin-bottom:8px;background:#fff;}
+.vacio{font-size:13px;color:#778;font-style:italic;padding:8px 0;}
+.datebar{display:flex;gap:8px;align-items:center;margin-bottom:10px;}
+.datebar .btn{min-width:46px;padding:0 12px;}
+.wa{white-space:pre-wrap;font-family:Consolas,monospace;font-size:12.5px;background:#f8fbff;border:1px dashed var(--borde);border-radius:7px;padding:12px;color:var(--texto);margin-top:10px;}
+.err{background:#fee2e2;color:#991b1b;border-radius:6px;padding:9px 11px;font-size:13.5px;font-weight:600;}
+
+.ov{position:fixed;inset:0;background:rgba(15,25,40,.55);z-index:300;overflow-y:auto;padding:12px;display:flex;}
+.sheet{background:var(--gris);border-radius:10px;width:100%;max-width:560px;margin:auto;}
+.sh-h{background:var(--azul);color:#fff;border-radius:10px 10px 0 0;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--naranja);}
+.sh-h b{font-size:16px;}
+.sh-x{width:44px;height:44px;border:none;border-radius:6px;background:var(--azul-m);color:#fff;font-size:22px;}
+.sh-b{padding:14px;display:flex;flex-direction:column;gap:13px;}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--azul);color:#fff;padding:12px 20px;border-radius:8px;z-index:400;font-weight:600;max-width:90%;text-align:center;}
+.fab{position:fixed;right:14px;bottom:16px;z-index:150;min-height:54px;padding:0 22px;border:none;border-radius:999px;background:var(--verde);color:#fff;font-size:16px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.28);}
+.pills{display:flex;gap:8px;}
+.pill{flex:1;min-height:44px;padding:0 6px;border:1.5px solid var(--azul);background:#fff;color:var(--azul);border-radius:999px;font-size:13.5px;font-weight:700;cursor:pointer;}
+.pill[aria-pressed="true"]{background:var(--azul);color:#fff;}
+.tcard{background:#fff;border:1px solid var(--borde);border-radius:8px;overflow:hidden;margin-bottom:14px;}
+.trow{display:grid;grid-template-columns:150px 1fr 1fr;gap:12px;padding:10px 12px;border-top:1px solid #e8edf3;align-items:start;}
+.thead{background:var(--azul);color:#fff;font-size:12.5px;font-weight:700;border-top:none;align-items:center;}
+.cl-t{display:none;font-size:12px;font-weight:700;color:var(--azul);margin-bottom:5px;}
+.slot{margin-bottom:10px;}
+.slot select{font-size:15px;}
+.addsel{color:#445;border-style:dashed;}
+.tdest{font-size:13px;font-weight:700;color:var(--azul);}
+@media(max-width:700px){.trow{grid-template-columns:1fr;gap:8px;padding:12px;} .thead{display:none;} .cl-t{display:block;}}
+.cardc{background:#fff;border:1px solid var(--borde);border-radius:8px;margin-bottom:8px;}
+.chead{display:flex;width:100%;align-items:center;justify-content:space-between;gap:8px;min-height:54px;padding:8px 12px;background:none;border:none;text-align:left;cursor:pointer;color:var(--texto);font-size:14.5px;}
+.chead .sub{font-size:12.5px;}
+.cbody{padding:10px 12px 12px;border-top:1px solid #eef1f5;}
+.u{margin-bottom:12px;}
+.addsel{color:#445;border-style:dashed;}
+.foot{margin-top:18px;font-size:12.5px;color:#556;display:flex;flex-direction:column;gap:8px;}
+.gate{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;}
+.gcard{background:#fff;border:1px solid var(--borde);border-top:4px solid var(--naranja);border-radius:10px;padding:22px;width:100%;max-width:380px;box-shadow:0 2px 10px rgba(0,0,0,.08);display:flex;flex-direction:column;gap:12px;}
+.gcard h1{font-size:20px;color:var(--azul);}
+</style>
+</head>
+<body>
+
+<div id="gate" class="gate"></div>
+<div id="app" style="display:none">
+<div class="top">
+  <div class="hdr">
+    <div>
+      <h1>🚛 Choferes</h1>
+      <p id="hdr-user">Corralón Municipal de Lanús</p>
+    </div>
+    <div class="row"><div class="hdr-tag" id="hdr-fecha"></div><button type="button" class="btn btn-o" id="logout" style="min-height:34px;padding:0 10px;font-size:12px">Salir</button></div>
+  </div>
+  <div class="tabs" role="tablist" id="tabs"></div>
+</div>
+<div class="content" id="panel"></div>
+<button class="fab" id="fab" type="button">➕ Unidad</button>
+</div>
+<div id="modal"></div>
+<div id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, getFirestore, collection, doc, getDoc, onSnapshot, setDoc, deleteDoc, deleteField, writeBatch, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+(function(){
+/* ════════ DATOS BASE ════════ */
+var DIRS = ['Ejecución en Red Vial','Desagües','Herrería','Depósito'];
+var BADGE = {'Ejecución en Red Vial':'b-d1','Desagües':'b-d2','Herrería':'b-d3','Depósito':'b-d4'};
+var HEADCOL = {'Ejecución en Red Vial':'#2c5f8a','Desagües':'#0f7a99','Herrería':'#b7791f','Depósito':'#6d28d9'};
+var ESTADOS = ['Operativo','En taller','Fuera de servicio'];
+var SUGERIDOS = ['Camioneta','Camión volcador','Camión atmosférico','Camión regador','Utilitario','Retroexcavadora','Minicargadora','Rodillo compactador','Autoelevador','Carretón'];
+var FIREBASE_CONFIG = {
+  apiKey: "AIzaSyAywfgcalMq_5VpnnN3JoEjd-2yYYmTGhk",
+  authDomain: "choferes-2914c.firebaseapp.com",
+  projectId: "choferes-2914c",
+  storageBucket: "choferes-2914c.firebasestorage.app",
+  messagingSenderId: "732040002252",
+  appId: "1:732040002252:web:f3f63faff34bccfea1e069"
+};
+var fbApp = initializeApp(FIREBASE_CONFIG);
+var auth = getAuth(fbApp), db;
+try{ db = initializeFirestore(fbApp,{localCache:persistentLocalCache({tabManager:persistentMultipleTabManager()})}); }catch(e){ db = getFirestore(fbApp); }
+
+function uid(){ return Math.random().toString(36).slice(2,9); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+function hoy(){ var d=new Date(); return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
+function addDays(iso,n){ var p=iso.split('-'); var d=new Date(+p[0],+p[1]-1,+p[2]+n); return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
+function fd(iso){ var p=iso.split('-'); return p[2]+'/'+p[1]+'/'+p[0]; }
+function fdc(iso){ var p=iso.split('-'); return p[2]+'/'+p[1]; }
+
+function seed(){
+  var T = hoy(), VIAL = 'Ejecución en Red Vial';
+  var crewNames = ['Emulsión','Bacheo 1','Bacheo 2','Bacheo 3','Terminadora','Fresadora','Sellado de Juntas','Albañilería','Preparación de Suelo','Relevamiento'];
+  var crews = crewNames.map(function(n,i){ return {id:'k'+(i+1),nombre:n,dir:VIAL,orden:i+1}; });
+  function U(id,tipo,codigo,unidad,marca,modelo,patente,chofer,estado,obs){ return {id:id,tipo:tipo,codigo:codigo,unidad:unidad,marca:marca,modelo:modelo,patente:patente,anio:'',horas:'',dir:VIAL,estado:estado||'Operativo',chofer:chofer||'',obs:obs||''}; }
+  var units = [
+    U('u1','Vehículo','V-01','Camión de emulsión','Ford','350','999 (interno 58)','Javier','Operativo','Le faltan las ruedas duales'),
+    U('u2','Vehículo','V-02','Camión volcador','Iveco','','AE 609 WI','Gabriel Valenzuela'),
+    U('u3','Vehículo','V-03','Camión volcador','Iveco','','NMY 827','Luis'),
+    U('u4','Vehículo','V-04','Camión volcador','Ford','','AB 743 FD',''),
+    U('u5','Vehículo','V-05','Camión balancín','Ford','','152','Ricardo Ruiz','Operativo','Le falta el escaneo y el silenciador'),
+    U('u6','Vehículo','V-06','Camión balancín','Ford','','AB 743 FC','Alberto Aparicio','Operativo','Pierde hidráulico y no funcionan las luces'),
+    U('u7','Vehículo','V-07','Camión con batea','Volkswagen','','AB 541 PE','Leo Gonzalez'),
+    U('u8','Vehículo','V-08','Camioneta con malacate','Ford','','IED 766','','En taller','En reparación'),
+    U('u9','Vehículo','V-09','Camioneta','China','','AG 979 DY',''),
+    U('u10','Vehículo','V-10','Camioneta','China','','AF 737 GS','Ariel Vicent'),
+    U('u11','Vehículo','V-11','Camioneta','China','','AG 979 DI',''),
+    U('u12','Vehículo','V-12','Camioneta','China','','AG 979 DP',''),
+    U('u13','Vehículo','V-13','Camioneta','Renault','Oroch','AB 562 WS','Darío'),
+    U('u14','Vehículo','V-14','Camioneta','Renault','Oroch','AB 568 WG',''),
+    U('u15','Carretón','C-01','Carretón de Bacheo 1','','','',''),
+    U('u16','Carretón','C-02','Carretón de Bacheo 2','','','',''),
+    U('u17','Carretón','C-03','Carretón de Bacheo 3','','','','','Operativo','Le faltan los ganchos de agarre y las ruedas están desentradas'),
+    U('u18','Carretón','C-04','Carretón de Terminadora','','','','','Operativo','No levanta la plancha, falta linga'),
+    U('u19','Maquinaria','M-01','Vibrocompactador','Hamm','HD 12','','','Operativo'),
+    U('u20','Maquinaria','M-02','Vibrocompactador','Hamm','','','','En taller','En reparación'),
+    U('u21','Maquinaria','M-03','Vibrocompactador amarillo','','','152','Alejandra Baricheval'),
+    U('u22','Maquinaria','M-04','Terminadora amarilla','','','','','En taller','A reparar'),
+    U('u23','Maquinaria','M-05','Terminadora blanca','','','','','Operativo','Pierde hidráulico en mangueras de comando; cambio de filtro de gasoil'),
+    U('u24','Maquinaria','M-06','Fresadora','','','DMLO3','Escalante / Guerreros','En taller','En reparación'),
+    U('u25','Maquinaria','M-07','Minicargadora (Bobcat amarilla)','Astarsa','','','','Operativo','Falta la tapa; reparar el cinturón de seguridad'),
+    U('u26','Maquinaria','M-08','Minicargadora (Bobcat)','New Holland','L318','','','Fuera de servicio','Máquina bloqueada'),
+    U('u27','Maquinaria','M-09','Fusor 1','','','',''),
+    U('u28','Maquinaria','M-10','Fusor 2','','','','')
+  ];
+  return {units:units,crews:crews};
+}
+var data = {units:[],crews:[],desp:{}};
+var loaded = {u:false,c:false};
+var me = null, isAdmin = false, canDesp = false;
+var unsubs = [], dsubs = {}, pend = false;
+var ORD = {'Vehículo':0,'Carretón':1,'Maquinaria':2};
+
+function run(p){ if(p && p.catch) p.catch(function(e){ toast('No se pudo guardar ('+(e.code||'error')+')'); }); }
+function errSnap(e){ toast('Error de lectura ('+(e.code||'error')+')'); }
+function ordUnits(a,b){ return ((ORD[a.tipo]||0)-(ORD[b.tipo]||0)) || String(a.codigo||'').localeCompare(String(b.codigo||''),'es',{numeric:true}); }
+function stopAll(){
+  unsubs.forEach(function(f){ f(); }); unsubs=[];
+  Object.keys(dsubs).forEach(function(k){ dsubs[k](); }); dsubs={};
+  data={units:[],crews:[],desp:{}}; loaded={u:false,c:false};
+}
+function softRender(){
+  var a=document.activeElement;
+  var busy = draft || (a && /^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName));
+  if(busy){ pend=true; return; }
+  render();
+}
+document.addEventListener('focusout',function(){
+  setTimeout(function(){ var a=document.activeElement; if(pend && !draft && !(a && /^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName))) render(); },250);
+});
+function subDesp(){
+  var want=[ui.fecha,addDays(ui.fecha,-1),hoy()];
+  Object.keys(dsubs).forEach(function(f){ if(want.indexOf(f)<0){ dsubs[f](); delete dsubs[f]; delete data.desp[f]; } });
+  want.forEach(function(f){
+    if(dsubs[f]) return;
+    dsubs[f]=onSnapshot(doc(db,'despliegue',f),function(s){
+      var d=s.exists()?s.data():null;
+      data.desp[f]=(d && d.asig)?d.asig:{};
+      softRender();
+    },errSnap);
+  });
+}
+/* escrituras */
+function wUnit(u){ return setDoc(doc(db,'unidades',u.id),u); }
+function wAsigMany(f,map){
+  var upd={}, n=0;
+  Object.keys(map).forEach(function(id){ var a=map[id]; upd[id]=(a&&a.length)?a:deleteField(); n++; });
+  if(!n) return null;
+  return setDoc(doc(db,'despliegue',f),{asig:upd,actualizado:serverTimestamp(),por:me.email},{merge:true});
+}
+
+var ui = {tab:'desp', open:{}, q:'', fdir:'', ftipo:'', festado:'', fecha:hoy(), delc:null};
+var draft = null;
+
+/* ════════ HELPERS ════════ */
+function unitById(id){ for(var i=0;i<data.units.length;i++){ if(data.units[i].id===id) return data.units[i]; } return null; }
+function crewById(id){ for(var i=0;i<data.crews.length;i++){ if(data.crews[i].id===id) return data.crews[i]; } return null; }
+function titulo(u){ return [u.marca,u.modelo].filter(Boolean).join(' ') || u.unidad; }
+function estCls(e){ return e==='Operativo'?'b-ok':(e==='En taller'?'b-taller':'b-fuera'); }
+function kardCls(e){ return e==='Operativo'?'ok':(e==='En taller'?'taller':'fuera'); }
+function dia(f){ if(!data.desp[f]) data.desp[f]={}; return data.desp[f]; }
+function destInfo(dest){
+  if(!dest) return {dir:'',nombre:''};
+  if(dest.indexOf('crew:')===0){ var c=crewById(dest.slice(5)); return c?{dir:c.dir,nombre:'Cuadrilla '+c.nombre}:{dir:'',nombre:'(cuadrilla eliminada)'}; }
+  var d=dest.slice(4); return {dir:d,nombre:d+' (general)'};
+}
+function toast(m){ var t=document.getElementById('toast'); t.innerHTML='<div class="toast" role="status">'+esc(m)+'</div>'; setTimeout(function(){ t.innerHTML=''; },2300); }
+function icono(u){ return u.tipo==='Maquinaria'?'🚜':(u.tipo==='Carretón'?'🚚':(/camioneta|utilitario/i.test(u.unidad)?'🛻':'🚛')); }
+function choferes(){ var s={}; data.units.forEach(function(u){ if(u.chofer) s[u.chofer]=1; }); Object.keys(data.desp).forEach(function(f){ Object.keys(data.desp[f]).forEach(function(k){ (data.desp[f][k]||[]).forEach(function(a){ if(a.chofer) s[a.chofer]=1; }); }); }); return Object.keys(s); }
+
+/* ════════ TABS ════════ */
+var TABS=[['flota','🚛 Flota'],['desp','📅 Despliegue'],['cuad','👥 Cuadrillas']];
+function renderTabs(){
+  document.getElementById('tabs').innerHTML = TABS.map(function(t){ return '<button type="button" role="tab" class="tab" data-tab="'+t[0]+'" aria-selected="'+(ui.tab===t[0])+'">'+t[1]+'</button>'; }).join('');
+  document.getElementById('hdr-fecha').textContent = fd(hoy());
+  document.getElementById('fab').style.display = (ui.tab==='flota' && isAdmin)?'block':'none';
+}
+
+/* ════════ PANEL: FLOTA ════════ */
+function viewFlota(){
+  if(!loaded.u||!loaded.c) return '<div class="vacio">Cargando flota…</div>';
+  var us=data.units;
+  function cnt(tipo){ return us.filter(function(u){return u.tipo===tipo;}).length; }
+  var nOp=us.filter(function(u){return u.estado==='Operativo';}).length;
+  var nTa=us.filter(function(u){return u.estado==='En taller';}).length;
+  var pillsH=[['','Todas',us.length],['Operativa','Operativas',nOp],['En taller','En taller',nTa]].map(function(p){
+    return '<button type="button" class="pill" data-festado="'+p[0]+'" aria-pressed="'+(ui.festado===p[0])+'">'+p[1]+' · '+p[2]+'</button>';
+  }).join('');
+  var h = '<div class="stats" style="grid-template-columns:repeat(5,1fr)">'
+    +'<div class="stat"><div class="n">'+us.length+'</div><div class="l">Unidades</div></div>'
+    +'<div class="stat"><div class="n">'+cnt('Vehículo')+'</div><div class="l">Vehículos</div></div>'
+    +'<div class="stat"><div class="n">'+cnt('Maquinaria')+'</div><div class="l">Máquinas</div></div>'
+    +'<div class="stat"><div class="n">'+cnt('Carretón')+'</div><div class="l">Carretones</div></div>'
+    +'<div class="stat"><div class="n" style="color:#b7791f">'+us.filter(function(u){return u.estado!=='Operativo';}).length+'</div><div class="l">No operativas</div></div></div>';
+  h += '<div class="card"><div class="fg">'
+    +'<div class="full"><div class="pills">'+pillsH+'</div></div>'
+    +'<div class="full"><input type="search" id="q" placeholder="🔍 Buscar código, marca, patente, chofer..." value="'+esc(ui.q)+'" aria-label="Buscar"></div>'
+    +'<div><label for="fdir">Dirección</label><select id="fdir"><option value="">Todas</option>'+DIRS.map(function(d){return '<option'+(ui.fdir===d?' selected':'')+'>'+esc(d)+'</option>';}).join('')+'</select></div>'
+    +'<div><label for="ftipo">Tipo</label><select id="ftipo"><option value="">Todos</option><option'+(ui.ftipo==='Vehículo'?' selected':'')+'>Vehículo</option><option'+(ui.ftipo==='Maquinaria'?' selected':'')+'>Maquinaria</option><option'+(ui.ftipo==='Carretón'?' selected':'')+'>Carretón</option></select></div>'
+    +'</div></div>';
+  var q=ui.q.trim().toLowerCase();
+  var list=us.filter(function(u){
+    if(ui.fdir && u.dir!==ui.fdir) return false;
+    if(ui.ftipo && u.tipo!==ui.ftipo) return false;
+    if(ui.festado==='Operativa' && u.estado!=='Operativo') return false;
+    if(ui.festado==='En taller' && u.estado!=='En taller') return false;
+    if(q){ var hay=[u.codigo,u.unidad,u.marca,u.modelo,u.patente,u.chofer].join(' ').toLowerCase(); if(hay.indexOf(q)<0) return false; }
+    return true;
+  });
+  if(!us.length && !data.crews.length && isAdmin) h += '<div class="card"><div class="card-title">Flota vacía</div><p class="sub" style="margin-bottom:10px">Podés cargar la flota del relevamiento (28 unidades de Ejecución en Red Vial y 10 cuadrillas) o ir cargando unidades con el botón ➕.</p><button type="button" class="btn btn-s btn-block" id="seed">Cargar flota inicial</button></div>';
+  if(!list.length && us.length) h += '<div class="vacio">No hay unidades con ese filtro.</div>';
+  if(!us.length && !isAdmin) h += '<div class="vacio">Todavía no hay unidades cargadas.</div>';
+  list.forEach(function(u){
+    var as=asigs(hoy(),u.id);
+    h += '<button type="button" class="kard '+kardCls(u.estado)+'" data-edit="'+u.id+'">'
+      +'<div class="row"><div class="grow"><b>'+icono(u)+' '+esc(u.codigo||'—')+' · '+esc(titulo(u))+'</b><div class="sub">'+esc(u.unidad)+(u.anio?' · '+esc(u.anio):'')+(u.patente?' · '+esc(u.patente):' · s/patente')+'</div></div>'
+      +'<span class="badge '+estCls(u.estado)+'">'+esc(u.estado)+'</span></div>'
+      +'<div style="margin-top:6px"><span class="badge '+BADGE[u.dir]+'">'+esc(u.dir)+'</span></div>'
+      +(as.length?'<span class="tag hoy">Hoy: '+as.map(function(a){ return esc(destInfo(a.dest).nombre)+(a.chofer?' · '+esc(a.chofer):''); }).join(' + ')+(as.length>1?' 🔁 compartida':'')+'</span>':'<span class="tag">Hoy: sin asignar</span>')
+      +'</button>';
+  });
+  return h;
+}
+
+/* ════════ PANEL: DESPLIEGUE (una lista por cuadrilla) ════════ */
+function asigs(f,id){ var dd=dia(f); return Array.isArray(dd[id])?dd[id]:[]; }
+function nombreCorto(dest){ return destInfo(dest).nombre.replace(/^Cuadrilla /,''); }
+function destOptions(unit,usados,ph){
+  usados=usados||[];
+  var order=[unit.dir].concat(DIRS.filter(function(d){return d!==unit.dir;}));
+  var h='<option value="">'+(ph||'Asignar a…')+'</option>';
+  order.forEach(function(d){
+    var ops=[];
+    if(usados.indexOf('dir:'+d)<0) ops.push('<option value="dir:'+esc(d)+'">'+esc(d)+' (general)</option>');
+    data.crews.filter(function(c){return c.dir===d;}).forEach(function(c){ if(usados.indexOf('crew:'+c.id)<0) ops.push('<option value="crew:'+c.id+'">Cuadrilla '+esc(c.nombre)+'</option>'); });
+    if(ops.length) h+='<optgroup label="'+esc(d)+'">'+ops.join('')+'</optgroup>';
+  });
+  return h;
+}
+function unitOpts(sel,f,destSelf){
+  var groups=[['Camiones y camionetas','Vehículo'],['Carretones','Carretón'],['Máquinas','Maquinaria']];
+  var h='';
+  groups.forEach(function(g){
+    var us=data.units.filter(function(u){return u.tipo===g[1];});
+    if(!us.length) return;
+    h+='<optgroup label="'+g[0]+'">'+us.map(function(u){
+      var ot=asigs(f,u.id).filter(function(x){return x.dest!==destSelf;});
+      var ok=u.estado==='Operativo';
+      var txt=(u.codigo||'—')+' · '+titulo(u)+(u.patente?' · '+u.patente:'')+(!ok?' — '+u.estado.toLowerCase():'')+(ot.length?' — 🔁 también en '+ot.map(function(x){return nombreCorto(x.dest);}).join(', '):'');
+      return '<option value="'+u.id+'"'+(u.id===sel?' selected':'')+(!ok&&u.id!==sel?' disabled':'')+'>'+esc(txt)+'</option>';
+    }).join('')+'</optgroup>';
+  });
+  return h;
+}
+function tarjetaDest(dest,nombre,f){
+  var as=[]; data.units.forEach(function(u){ asigs(f,u.id).forEach(function(a){ if(a.dest===dest) as.push({u:u,a:a}); }); });
+  as.sort(function(x,y){ return ORD[x.u.tipo]-ORD[y.u.tipo]; });
+  var dirDest=destInfo(dest).dir, abierta=!!ui.open[dest];
+  var nComp=as.filter(function(e){return asigs(f,e.u.id).length>1;}).length;
+  var resumen=as.length?as.map(function(e){return icono(e.u)+' '+esc(e.u.codigo||titulo(e.u));}).join('  '):'Sin unidades';
+  var h='<div class="cardc"><button type="button" class="chead" data-toggle="'+esc(dest)+'" aria-expanded="'+abierta+'">'
+    +'<span class="grow"><b>'+esc(nombre)+'</b> <span class="sub">· '+as.length+(as.length===1?' unidad':' unidades')+'</span>'
+    +(abierta?'':'<span class="sub" style="display:block;margin-top:2px">'+resumen+'</span>')+'</span>'
+    +(nComp?'<span class="badge b-taller">'+nComp+(nComp===1?' compartida':' compartidas')+'</span>':'')
+    +'<span style="font-size:18px;color:#556" aria-hidden="true">'+(abierta?'▾':'▸')+'</span></button>';
+  if(abierta){
+    h+='<div class="cbody">';
+    as.forEach(function(e){
+      var u=e.u,a=e.a, otros=asigs(f,u.id).filter(function(x){return x.dest!==dest;});
+      h+='<div class="u"><div class="row"><span style="font-size:22px;width:26px;text-align:center" aria-hidden="true">'+icono(u)+'</span>'
+        +'<select class="grow" data-slot="1" data-dest="'+esc(dest)+'" data-prev="'+u.id+'" aria-label="Unidad"><option value="">— quitar —</option>'+unitOpts(u.id,f,dest)+'</select>'
+        +'<button type="button" class="btn-x" data-quitar="'+u.id+'" data-dest="'+esc(dest)+'" aria-label="Quitar de esta cuadrilla">✕</button></div>'
+        +'<div style="padding-left:34px;margin-top:6px"><input type="text" list="dl-chof" data-chofer="'+u.id+'" data-dest="'+esc(dest)+'" placeholder="Chofer" value="'+esc(a.chofer)+'" aria-label="Chofer de '+esc(titulo(u))+'">'
+        +(u.estado!=='Operativo'?'<span class="tag warn">⚠️ Está '+esc(u.estado.toLowerCase())+'</span>':'')
+        +(u.dir!==dirDest?'<span class="tag info">Prestada de '+esc(u.dir)+'</span>':'')
+        +(otros.length?'<span class="tag info">🔁 También en '+otros.map(function(x){return esc(nombreCorto(x.dest));}).join(', ')+'</span>':'')
+        +'</div></div>';
+    });
+    h+='<select class="addsel" data-slot="1" data-dest="'+esc(dest)+'" data-prev="" aria-label="Agregar unidad"><option value="">+ Agregar unidad…</option>'+unitOpts('',f,dest)+'</select></div>';
+  }
+  return h+'</div>';
+}
+function viewDesp(){
+  var f=ui.fecha;
+  var asign=data.units.filter(function(u){return asigs(f,u.id).length;});
+  var libres=data.units.filter(function(u){return !asigs(f,u.id).length && u.estado==='Operativo';});
+  var noop=data.units.filter(function(u){return u.estado!=='Operativo';});
+  var comp=asign.filter(function(u){return asigs(f,u.id).length>1;});
+  var h='<div class="card"><div class="card-title">📅 Despliegue del día</div>'
+    +'<div class="datebar"><button type="button" class="btn btn-o" data-day="-1" aria-label="Día anterior">◀</button><input type="date" id="fecha" value="'+f+'" aria-label="Fecha"><button type="button" class="btn btn-o" data-day="1" aria-label="Día siguiente">▶</button></div>'
+    +'<div class="row wrap"><button type="button" class="btn btn-p grow" id="copiar">📋 Copiar del día anterior</button><button type="button" class="btn btn-d" id="limpiar">Limpiar día</button></div></div>';
+  h+='<div class="stats" style="grid-template-columns:repeat(3,1fr)"><div class="stat"><div class="n" style="color:#2d6a4f">'+asign.length+'</div><div class="l">Asignadas</div></div><div class="stat"><div class="n" style="color:#8a5a00">'+comp.length+'</div><div class="l">Compartidas</div></div><div class="stat"><div class="n" style="color:#2c5f8a">'+libres.length+'</div><div class="l">Sin asignar</div></div></div>';
+
+  h+='<div class="sec-head" style="background:#2c5f8a"><span>🟦 SIN ASIGNAR</span><span>'+libres.length+'</span></div>';
+  if(!libres.length) h+='<div class="vacio">Todas las unidades operativas ya tienen destino.</div>';
+  libres.forEach(function(u){
+    h+='<div class="item"><div style="margin-bottom:6px"><b>'+icono(u)+' '+esc(u.codigo||'—')+' · '+esc(titulo(u))+'</b> <span class="badge '+BADGE[u.dir]+'">'+esc(u.dir)+'</span></div>'
+      +'<select data-asignar="'+u.id+'" aria-label="Asignar '+esc(titulo(u))+'">'+destOptions(u)+'</select></div>';
+  });
+
+  h+='<div class="row wrap" style="margin:14px 0 4px"><button type="button" class="btn btn-o grow" data-openall="1">Abrir todas</button><button type="button" class="btn btn-o grow" data-openall="0">Cerrar todas</button></div>';
+  DIRS.forEach(function(d){
+    var cs=data.crews.filter(function(c){return c.dir===d;});
+    var hayGeneral=!cs.length || data.units.some(function(u){ return asigs(f,u.id).some(function(x){return x.dest==='dir:'+d;}); });
+    h+='<div class="sec-head" style="background:'+HEADCOL[d]+'"><span>'+esc(d.toUpperCase())+'</span><span>'+cs.length+(cs.length===1?' cuadrilla':' cuadrillas')+'</span></div>';
+    cs.forEach(function(c){ h+=tarjetaDest('crew:'+c.id,'Cuadrilla '+c.nombre,f); });
+    if(hayGeneral) h+=tarjetaDest('dir:'+d,d+' (general)',f);
+  });
+  if(noop.length){
+    h+='<div class="sec-head" style="background:#b7791f"><span>🔧 NO OPERATIVAS</span><span>'+noop.length+'</span></div>';
+    noop.forEach(function(u){ h+='<div class="item"><b>'+icono(u)+' '+esc(u.codigo||'—')+' · '+esc(titulo(u))+'</b> <span class="badge '+estCls(u.estado)+'">'+esc(u.estado)+'</span><div class="sub">'+esc(u.dir)+(u.obs?' · '+esc(u.obs):'')+'</div></div>'; });
+  }
+  h+='<datalist id="dl-chof">'+choferes().map(function(c){return '<option value="'+esc(c)+'">';}).join('')+'</datalist>';
+  return h;
+}
+
+/* ════════ PANEL: CUADRILLAS ════════ */
+function viewCuad(){
+  var h=!isAdmin?'':'<div class="card"><div class="card-title">➕ Nueva cuadrilla</div><div class="fg">'
+    +'<div><label for="nc-n">Nombre</label><input type="text" id="nc-n" placeholder="Ej: Bacheo 3"></div>'
+    +'<div><label for="nc-d">Dirección</label><select id="nc-d">'+DIRS.map(function(d){return '<option>'+esc(d)+'</option>';}).join('')+'</select></div>'
+    +'<div class="full"><button type="button" class="btn btn-s btn-block" id="nc-add">✓ Agregar cuadrilla</button></div></div></div>';
+  DIRS.forEach(function(d){
+    var cs=data.crews.filter(function(c){return c.dir===d;});
+    h+='<div class="sec-head" style="background:'+HEADCOL[d]+'"><span>'+esc(d.toUpperCase())+'</span><span>'+cs.length+'</span></div>';
+    if(!cs.length) h+='<div class="vacio">Sin cuadrillas.</div>';
+    cs.forEach(function(c){
+      var m=data.units.filter(function(u){return asigs(ui.fecha,u.id).some(function(x){return x.dest==='crew:'+c.id;});});
+      h+='<div class="item"><div class="row"><div class="grow"><b>Cuadrilla '+esc(c.nombre)+'</b><div class="sub">'+(m.length?m.map(function(u){return icono(u)+' '+esc(titulo(u))+(asigs(ui.fecha,u.id).length>1?' 🔁':'');}).join(' · '):'Sin unidades el '+fdc(ui.fecha))+'</div></div>'
+        +(isAdmin?'<button type="button" class="btn-x" data-delcrew="'+c.id+'" aria-label="Eliminar cuadrilla"'+(ui.delc===c.id?' style="background:#b32d20;color:#fff;width:auto;padding:0 10px"':'')+'>'+(ui.delc===c.id?'¿Eliminar?':'✕')+'</button>':'')+'</div></div>';
+    });
+  });
+  return h;
+}
+
+/* ════════ RENDER ════════ */
+function render(){
+  pend=false;
+  renderTabs();
+  var p=document.getElementById('panel');
+  p.innerHTML = ui.tab==='flota'?viewFlota():(ui.tab==='desp'?viewDesp():viewCuad());
+  applyRO();
+  var q=document.getElementById('q');
+  if(q){ q.addEventListener('input',function(){ ui.q=q.value; var pos=q.selectionStart; render(); var q2=document.getElementById('q'); q2.focus(); try{q2.setSelectionRange(pos,pos);}catch(e){} }); }
+}
+
+function applyRO(){
+  var edit = ui.tab==='desp' ? canDesp : isAdmin;
+  document.getElementById('fab').style.display = (ui.tab==='flota' && isAdmin)?'block':'none';
+  if(edit) return;
+  var p=document.getElementById('panel');
+  [].forEach.call(p.querySelectorAll('select,input[type=text]'),function(el){ el.disabled=true; });
+  [].forEach.call(p.querySelectorAll('[data-quitar],[data-delcrew],#copiar,#limpiar,.addsel'),function(el){ el.style.display='none'; });
+}
+
+/* ════════ FORMULARIO DE UNIDAD ════════ */
+function blank(){ return {id:'',tipo:'Vehículo',codigo:'',unidad:'',marca:'',modelo:'',patente:'',anio:'',horas:'',dir:DIRS[0],estado:'Operativo',chofer:'',obs:'',confirmDel:false,error:''}; }
+function openForm(id){
+  if(id){ draft=JSON.parse(JSON.stringify(unitById(id))); draft.confirmDel=false; draft.error=''; } else { draft=blank(); }
+  renderForm();
+}
+function readForm(){
+  ['tipo','codigo','unidad','marca','modelo','patente','anio','horas','dir','estado','chofer','obs'].forEach(function(k){ var el=document.getElementById('f_'+k); if(el) draft[k]=el.value; });
+}
+function renderForm(){
+  var d=draft, isM=d.tipo==='Maquinaria';
+  function inp(k,lab,ph,ex){ return '<div><label for="f_'+k+'">'+lab+'</label><input type="text" id="f_'+k+'" value="'+esc(d[k])+'" placeholder="'+esc(ph||'')+'" '+(ex||'')+'></div>'; }
+  function sel(k,lab,opts){ return '<div><label for="f_'+k+'">'+lab+'</label><select id="f_'+k+'">'+opts.map(function(o){return '<option'+(d[k]===o?' selected':'')+'>'+esc(o)+'</option>';}).join('')+'</select></div>'; }
+  var h='<div class="ov"><div class="sheet" role="dialog" aria-modal="true" aria-label="Unidad"><div class="sh-h"><b>'+(d.id?'Editar unidad':'➕ Cargar unidad')+'</b><button type="button" class="sh-x" id="sh-close" aria-label="Cerrar">×</button></div><div class="sh-b">'
+    +'<div class="fg keep2"><div class="full">'+'<label for="f_tipo">¿Qué vas a cargar?</label><select id="f_tipo"><option'+(d.tipo==='Vehículo'?' selected':'')+'>Vehículo</option><option'+(isM?' selected':'')+'>Maquinaria</option><option'+(d.tipo==='Carretón'?' selected':'')+'>Carretón</option></select></div></div>'
+    +'<div class="fg">'+inp('codigo','Nombre o código interno','Ej: V-07')
+    +'<div><label for="f_unidad">Tipo de unidad</label><input type="text" id="f_unidad" list="dl-uni" value="'+esc(d.unidad)+'" placeholder="Ej: Camión volcador"><datalist id="dl-uni">'+SUGERIDOS.map(function(s){return '<option value="'+s+'">';}).join('')+'</datalist></div>'
+    +inp('marca','Marca','Ej: Toyota')+inp('modelo','Modelo','Ej: Hilux')
+    +inp('patente',isM?'Patente (si tiene)':'Patente','AB 123 CD','style="text-transform:uppercase"')+inp('anio','Año','2019','inputmode="numeric"')
+    +(isM?inp('horas','Horas de uso (horómetro)','Ej: 4200','inputmode="numeric"'):'')
+    +sel('dir','¿A qué dirección pertenece?',DIRS)+sel('estado','Estado',ESTADOS)
+    +'<div class="full">'+inp('chofer','Chofer habitual (opcional)','Nombre y apellido','list="dl-chof2"')+'<datalist id="dl-chof2">'+choferes().map(function(c){return '<option value="'+esc(c)+'">';}).join('')+'</datalist></div>'
+    +'<div class="full"><label for="f_obs">Observaciones</label><textarea id="f_obs" rows="2" placeholder="Opcional">'+esc(d.obs)+'</textarea></div></div>'
+    +(d.error?'<div class="err" role="alert">'+esc(d.error)+'</div>':'')
+    +'<button type="button" class="btn btn-s btn-block" id="sh-save" style="min-height:52px;font-size:16px">✓ Guardar unidad</button>'
+    +(d.id?'<button type="button" class="btn btn-d btn-block'+(d.confirmDel?' conf':'')+'" id="sh-del">'+(d.confirmDel?'Tocá de nuevo para confirmar':'Eliminar unidad')+'</button>':'')
+    +'</div></div></div>';
+  document.getElementById('modal').innerHTML=h;
+}
+function closeForm(){ draft=null; document.getElementById('modal').innerHTML=''; }
+function saveForm(){
+  readForm(); var d=draft;
+  if(!d.codigo.trim() && !d.unidad.trim()){ d.error='Poné al menos el código o el tipo de unidad.'; renderForm(); return; }
+  var pat=d.patente.trim().toUpperCase();
+  if(pat && /[A-Z]/.test(pat)){ var dup=data.units.filter(function(u){return u.id!==d.id && (u.patente||'').toUpperCase()===pat;})[0]; if(dup){ d.error='Esa patente ya está cargada ('+(dup.codigo||titulo(dup))+').'; renderForm(); return; } }
+  var rec={id:d.id||uid(),tipo:d.tipo,codigo:d.codigo.trim(),unidad:d.unidad.trim(),marca:d.marca.trim(),modelo:d.modelo.trim(),patente:pat,anio:d.anio.trim(),horas:d.tipo==='Maquinaria'?d.horas.trim():'',dir:d.dir,estado:d.estado,chofer:d.chofer.trim(),obs:d.obs.trim()};
+  var edit=!!d.id;
+  if(edit){ data.units=data.units.map(function(u){return u.id===d.id?rec:u;}); } else { data.units.push(rec); }
+  run(wUnit(rec)); closeForm(); render(); toast(edit?'Unidad actualizada':'Unidad cargada');
+}
+
+/* ════════ ACCESO ════════ */
+function showGate(h){
+  document.getElementById('app').style.display='none';
+  var g=document.getElementById('gate'); g.style.display='flex';
+  g.innerHTML='<div class="gcard">'+h+'</div>';
+}
+function showLogin(msg){
+  showGate('<div><h1>🚛 Choferes</h1><p class="sub">Corralón Municipal de Lanús</p></div>'
+    +'<form id="lf" style="display:flex;flex-direction:column;gap:12px">'
+    +'<div><label for="lg-e">Email</label><input type="email" id="lg-e" autocomplete="username" inputmode="email" autocapitalize="none"></div>'
+    +'<div><label for="lg-p">Contraseña</label><input type="password" id="lg-p" autocomplete="current-password"></div>'
+    +(msg?'<div class="err" role="alert">'+esc(msg)+'</div>':'')
+    +'<button type="submit" class="btn btn-p btn-block" id="lg-b" style="min-height:50px">Ingresar</button></form>');
+}
+function showNoAccess(user,err){
+  showGate('<div><h1>🚛 Choferes</h1><p class="sub">'+esc(user.email||'')+'</p></div>'
+    +'<div class="err" role="alert">'+(err?'No se pudo verificar tu acceso ('+esc(err.code||'error')+').':'Tu usuario todavía no tiene permisos en este sistema. Pedile al administrador que te habilite.')+'</div>'
+    +'<button type="button" class="btn btn-o btn-block" id="lg-out">Salir</button>');
+}
+function authMsg(e){
+  var c=e&&e.code||'';
+  if(c==='auth/invalid-credential'||c==='auth/wrong-password'||c==='auth/user-not-found'||c==='auth/invalid-email') return 'Email o contraseña incorrectos.';
+  if(c==='auth/too-many-requests') return 'Demasiados intentos. Esperá un momento y probá de nuevo.';
+  if(c==='auth/network-request-failed') return 'Sin conexión a internet.';
+  return 'No se pudo ingresar ('+c+').';
+}
+function startApp(){
+  document.getElementById('gate').style.display='none';
+  document.getElementById('app').style.display='block';
+  document.getElementById('hdr-user').textContent='Corralón Municipal de Lanús · '+me.nombre+' ('+me.rol+')';
+  unsubs.push(onSnapshot(collection(db,'unidades'),function(s){
+    data.units=s.docs.map(function(d){ var u=d.data(); u.id=d.id; return u; }).sort(ordUnits);
+    loaded.u=true; softRender();
+  },errSnap));
+  unsubs.push(onSnapshot(collection(db,'cuadrillas'),function(s){
+    data.crews=s.docs.map(function(d){ var c=d.data(); c.id=d.id; return c; }).sort(function(a,b){ return (a.orden||0)-(b.orden||0); });
+    loaded.c=true; softRender();
+  },errSnap));
+  subDesp(); render();
+}
+onAuthStateChanged(auth,function(user){
+  stopAll(); me=null; isAdmin=false; canDesp=false; draft=null; document.getElementById('modal').innerHTML='';
+  if(!user){ showLogin(); return; }
+  getDoc(doc(db,'usuarios',user.uid)).then(function(s){
+    var d=s.exists()?s.data():null;
+    if(!d || ['admin','editor','lector'].indexOf(d.rol)<0){ showNoAccess(user); return; }
+    me={uid:user.uid,email:user.email,rol:d.rol,nombre:d.nombre||user.email};
+    isAdmin=d.rol==='admin'; canDesp=isAdmin||d.rol==='editor';
+    startApp();
+  }).catch(function(e){ showNoAccess(user,e); });
+});
+
+/* ════════ EVENTOS ════════ */
+document.addEventListener('submit',function(e){
+  if(e.target.id!=='lf') return; e.preventDefault();
+  var em=document.getElementById('lg-e').value.trim(), pw=document.getElementById('lg-p').value;
+  if(!em||!pw){ showLogin('Completá email y contraseña.'); return; }
+  var b=document.getElementById('lg-b'); b.disabled=true; b.textContent='Ingresando…';
+  signInWithEmailAndPassword(auth,em,pw).catch(function(err){ showLogin(authMsg(err)); });
+});
+document.addEventListener('click',function(e){
+  var t=e.target.closest('button'); if(!t) return;
+  if(t.id==='logout'||t.id==='lg-out'){ signOut(auth); return; }
+  if(!me) return;
+  if(t.id==='fab'){ if(isAdmin) openForm(null); return; }
+  if(t.dataset.tab){ ui.tab=t.dataset.tab; ui.delc=null; render(); window.scrollTo(0,0); return; }
+  if(t.dataset.festado!==undefined){ ui.festado=t.dataset.festado; render(); return; }
+  if(t.dataset.toggle){ ui.open[t.dataset.toggle]=!ui.open[t.dataset.toggle]; render(); return; }
+  if(t.dataset.openall!==undefined){
+    ui.open={};
+    if(t.dataset.openall==='1'){ data.crews.forEach(function(c){ ui.open['crew:'+c.id]=true; }); DIRS.forEach(function(d){ ui.open['dir:'+d]=true; }); }
+    render(); return;
+  }
+  if(t.dataset.edit){ if(isAdmin) openForm(t.dataset.edit); return; }
+  if(t.id==='seed'){
+    if(!isAdmin||data.units.length||data.crews.length) return;
+    var sd=seed(), b=writeBatch(db);
+    sd.units.forEach(function(u){ b.set(doc(db,'unidades',u.id),u); });
+    sd.crews.forEach(function(c){ b.set(doc(db,'cuadrillas',c.id),c); });
+    t.disabled=true;
+    b.commit().then(function(){ toast('Flota inicial cargada'); }).catch(function(er){ toast('No se pudo cargar ('+(er.code||'error')+')'); t.disabled=false; });
+    return;
+  }
+  if(t.dataset.day){ ui.fecha=addDays(ui.fecha,+t.dataset.day); subDesp(); render(); return; }
+  if(t.id==='copiar'){
+    if(!canDesp) return;
+    var f=ui.fecha, prev=dia(addDays(f,-1)), cur=dia(f), n=0, add={};
+    Object.keys(prev).forEach(function(id){ var u=unitById(id); if(u && u.estado==='Operativo' && !cur[id] && Array.isArray(prev[id])){ cur[id]=prev[id].map(function(x){return {dest:x.dest,chofer:x.chofer};}); add[id]=cur[id]; n++; } });
+    if(n) run(wAsigMany(f,add));
+    render(); toast(n?('Se copiaron '+n+' asignaciones'):'No había nada para copiar del día anterior'); return;
+  }
+  if(t.id==='limpiar'){
+    if(!canDesp) return;
+    run(setDoc(doc(db,'despliegue',ui.fecha),{asig:{},actualizado:serverTimestamp(),por:me.email}));
+    data.desp[ui.fecha]={}; render(); toast('Día limpiado'); return;
+  }
+  if(t.dataset.quitar){
+    if(!canDesp) return;
+    var qd=dia(ui.fecha), qid=t.dataset.quitar, qa=asigs(ui.fecha,qid).filter(function(x){return x.dest!==t.dataset.dest;});
+    if(qa.length) qd[qid]=qa; else delete qd[qid];
+    var qm={}; qm[qid]=qa; run(wAsigMany(ui.fecha,qm)); render(); return;
+  }
+  if(t.id==='nc-add'){
+    if(!isAdmin) return;
+    var nn=document.getElementById('nc-n').value.trim(); if(!nn){ toast('Escribí el nombre de la cuadrilla'); return; }
+    var nc={id:uid(),nombre:nn,dir:document.getElementById('nc-d').value,orden:Date.now()};
+    run(setDoc(doc(db,'cuadrillas',nc.id),nc)); toast('Cuadrilla agregada'); return;
+  }
+  if(t.dataset.delcrew){
+    if(!isAdmin) return;
+    var c0=t.dataset.delcrew;
+    if(ui.delc!==c0){ ui.delc=c0; render(); return; }
+    ui.delc=null;
+    var cid='crew:'+c0;
+    data.crews=data.crews.filter(function(c){return c.id!==c0;});
+    Object.keys(data.desp).forEach(function(fd_){
+      var m={}, any=false;
+      Object.keys(data.desp[fd_]).forEach(function(k){
+        var old=data.desp[fd_][k]||[], nl=old.filter(function(x){return x.dest!==cid;});
+        if(nl.length!==old.length){ any=true; m[k]=nl; if(nl.length) data.desp[fd_][k]=nl; else delete data.desp[fd_][k]; }
+      });
+      if(any) run(wAsigMany(fd_,m));
+    });
+    run(deleteDoc(doc(db,'cuadrillas',c0))); render(); toast('Cuadrilla eliminada'); return;
+  }
+  if(!draft) return;
+  if(t.id==='sh-close'){ closeForm(); return; }
+  if(t.id==='sh-save'){ saveForm(); return; }
+  if(t.id==='sh-del'){
+    if(!draft.confirmDel){ readForm(); draft.confirmDel=true; renderForm(); return; }
+    var did=draft.id; data.units=data.units.filter(function(u){return u.id!==did;});
+    Object.keys(data.desp).forEach(function(fd_){ if(data.desp[fd_][did]){ delete data.desp[fd_][did]; var m2={}; m2[did]=null; run(wAsigMany(fd_,m2)); } });
+    run(deleteDoc(doc(db,'unidades',did)));
+    closeForm(); render(); toast('Unidad eliminada'); return;
+  }
+});
+document.addEventListener('change',function(e){
+  if(!me) return;
+  var el=e.target;
+  if(draft && el.id==='f_tipo'){ readForm(); if(draft.tipo==='Carretón' && !draft.unidad.trim()) draft.unidad='Carretón'; renderForm(); return; }
+  if(el.id==='fdir'){ ui.fdir=el.value; render(); return; }
+  if(el.id==='ftipo'){ ui.ftipo=el.value; render(); return; }
+  if(el.id==='fecha'){ if(el.value){ ui.fecha=el.value; subDesp(); render(); } return; }
+  if(el.dataset && el.dataset.slot){
+    if(!canDesp) return;
+    var f=ui.fecha, dst=el.dataset.dest, pv=el.dataset.prev, nu=el.value, dd3=dia(f), m={};
+    if(pv && nu===pv) return;
+    if(pv){ var l=asigs(f,pv).filter(function(x){return x.dest!==dst;}); if(l.length) dd3[pv]=l; else delete dd3[pv]; m[pv]=l; }
+    if(nu){ var uu=unitById(nu); var ar=Array.isArray(dd3[nu])?dd3[nu]:[]; if(!ar.some(function(x){return x.dest===dst;})) ar.push({dest:dst,chofer:uu.chofer||''}); dd3[nu]=ar; m[nu]=ar; }
+    run(wAsigMany(f,m)); render(); return;
+  }
+  if(el.dataset && el.dataset.asignar){
+    if(!canDesp || !el.value) return;
+    var aid=el.dataset.asignar, u=unitById(aid), dd2=dia(ui.fecha);
+    var arr=Array.isArray(dd2[aid])?dd2[aid]:[];
+    if(!arr.some(function(x){return x.dest===el.value;})) arr.push({dest:el.value,chofer:u.chofer||''});
+    dd2[aid]=arr; var m3={}; m3[aid]=arr; run(wAsigMany(ui.fecha,m3)); render(); toast('Asignada'); return;
+  }
+  if(el.dataset && el.dataset.chofer){
+    if(!canDesp) return;
+    var cu=el.dataset.chofer, a=asigs(ui.fecha,cu).filter(function(x){return x.dest===el.dataset.dest;})[0];
+    if(a){ a.chofer=el.value.trim(); var m4={}; m4[cu]=asigs(ui.fecha,cu); run(wAsigMany(ui.fecha,m4)); }
+    return;
+  }
+});
+
+showGate('<p class="sub">Cargando…</p>');
+})();
+</script>
+</body>
+</html>
