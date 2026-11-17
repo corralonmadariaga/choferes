@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Choferes · Corralón Municipal de Lanús</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1a3a5c">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Choferes">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
 <style>
 :root{
   --azul:#1a3a5c;--azul-m:#2c5f8a;--azul-c:#d6e8f7;
@@ -651,5 +658,6 @@ document.addEventListener('change',function(e){
 showGate('<p class="sub">Cargando…</p>');
 })();
 </script>
+<script>if("serviceWorker" in navigator){ window.addEventListener("load",function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); }); }</script>
 </body>
 </html>
