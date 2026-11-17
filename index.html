@@ -135,7 +135,7 @@ textarea{resize:vertical;}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, getFirestore, collection, doc, getDoc, onSnapshot, setDoc, deleteDoc, deleteField, writeBatch, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 (function(){
 /* ════════ DATOS BASE ════════ */
@@ -200,7 +200,7 @@ function seed(){
   ];
   return {units:units,crews:crews};
 }
-var data = {units:[],crews:[],desp:{}};
+var data = {units:[],crews:[],desp:{},users:[]};
 var loaded = {u:false,c:false};
 var me = null, isAdmin = false, canDesp = false;
 var unsubs = [], dsubs = {}, pend = false;
@@ -212,7 +212,7 @@ function ordUnits(a,b){ return ((ORD[a.tipo]||0)-(ORD[b.tipo]||0)) || String(a.c
 function stopAll(){
   unsubs.forEach(function(f){ f(); }); unsubs=[];
   Object.keys(dsubs).forEach(function(k){ dsubs[k](); }); dsubs={};
-  data={units:[],crews:[],desp:{}}; loaded={u:false,c:false};
+  data={units:[],crews:[],desp:{},users:[]}; loaded={u:false,c:false};
 }
 function softRender(){
   var a=document.activeElement;
@@ -244,7 +244,7 @@ function wAsigMany(f,map){
   return setDoc(doc(db,'despliegue',f),{asig:upd,actualizado:serverTimestamp(),por:me.email},{merge:true});
 }
 
-var ui = {tab:'desp', open:{}, q:'', fdir:'', ftipo:'', festado:'', fecha:hoy(), delc:null};
+var ui = {tab:'desp', open:{}, q:'', fdir:'', ftipo:'', festado:'', fecha:hoy(), delc:null, delu:null};
 var draft = null;
 
 /* ════════ HELPERS ════════ */
@@ -266,7 +266,7 @@ function choferes(){ var s={}; data.units.forEach(function(u){ if(u.chofer) s[u.
 /* ════════ TABS ════════ */
 var TABS=[['flota','🚛 Flota'],['desp','📅 Despliegue'],['cuad','👥 Cuadrillas']];
 function renderTabs(){
-  document.getElementById('tabs').innerHTML = TABS.map(function(t){ return '<button type="button" role="tab" class="tab" data-tab="'+t[0]+'" aria-selected="'+(ui.tab===t[0])+'">'+t[1]+'</button>'; }).join('');
+  document.getElementById('tabs').innerHTML = TABS.concat(isAdmin?[['usr','👤 Usuarios']]:[]).map(function(t){ return '<button type="button" role="tab" class="tab" data-tab="'+t[0]+'" aria-selected="'+(ui.tab===t[0])+'">'+t[1]+'</button>'; }).join('');
   document.getElementById('hdr-fecha').textContent = fd(hoy());
   document.getElementById('fab').style.display = (ui.tab==='flota' && isAdmin)?'block':'none';
 }
@@ -428,12 +428,71 @@ function viewCuad(){
   return h;
 }
 
+/* ════════ PANEL: USUARIOS (admin) ════════ */
+var ROLES = [['admin','Admin — todo, incluida la flota'],['editor','Editor — arma el despliegue del día'],['lector','Lector — solo mira']];
+var auxApp = null;
+function auxAuth(){ if(!auxApp) auxApp = initializeApp(FIREBASE_CONFIG,'aux'); return getAuth(auxApp); }
+function rolBadge(r){ return r==='admin'?'b-d1':(r==='editor'?'b-ok':'b-d4'); }
+function viewUsr(){
+  if(!isAdmin) return '';
+  var h='<div class="card"><div class="card-title">➕ Nuevo usuario</div><div class="fg">'
+    +'<div><label for="u-n">Nombre</label><input type="text" id="u-n" placeholder="Nombre y apellido" autocomplete="off"></div>'
+    +'<div><label for="u-r">Rol</label><select id="u-r">'+ROLES.map(function(r){ return '<option value="'+r[0]+'"'+(r[0]==='editor'?' selected':'')+'>'+esc(r[1])+'</option>'; }).join('')+'</select></div>'
+    +'<div><label for="u-e">Email</label><input type="email" id="u-e" placeholder="nombre@ejemplo.com" autocomplete="off" autocapitalize="none" inputmode="email"></div>'
+    +'<div><label for="u-p">Contraseña (mínimo 6)</label><input type="text" id="u-p" autocomplete="off" autocapitalize="none"></div>'
+    +'<div class="full"><button type="button" class="btn btn-s btn-block" id="u-add">✓ Crear usuario</button></div></div></div>';
+  h+='<div class="sec-head" style="background:#1a3a5c"><span>USUARIOS CON ACCESO</span><span>'+data.users.length+'</span></div>';
+  if(!data.users.length) h+='<div class="vacio">Cargando…</div>';
+  data.users.forEach(function(u){
+    var yo = me && u.id===me.uid, ask = ui.delu===u.id;
+    h+='<div class="item"><div class="row"><div class="grow"><b>'+esc(u.nombre||'(sin nombre)')+'</b>'+(yo?' <span class="sub">· vos</span>':'')+'<div class="sub">'+esc(u.email||'')+'</div></div><span class="badge '+rolBadge(u.rol)+'">'+esc(u.rol||'—')+'</span></div>'
+      +'<div class="fg" style="margin-top:10px"><div><label for="un-'+u.id+'">Nombre</label><input type="text" id="un-'+u.id+'" value="'+esc(u.nombre||'')+'" autocomplete="off"></div>'
+      +'<div><label for="ur-'+u.id+'">Rol</label><select id="ur-'+u.id+'"'+(yo?' disabled':'')+'>'+ROLES.map(function(r){ return '<option value="'+r[0]+'"'+(u.rol===r[0]?' selected':'')+'>'+esc(r[1])+'</option>'; }).join('')+'</select></div></div>'
+      +'<div class="row wrap" style="margin-top:10px"><button type="button" class="btn btn-p grow" data-usave="'+u.id+'">Guardar</button>'
+      +'<button type="button" class="btn btn-o grow" data-ureset="'+esc(u.email||'')+'">✉️ Mail para cambiar contraseña</button>'
+      +(yo?'':'<button type="button" class="btn btn-d'+(ask?' conf':'')+' grow" data-udel="'+u.id+'">'+(ask?'Tocá de nuevo para quitar el acceso':'Quitar acceso')+'</button>')
+      +'</div></div>';
+  });
+  h+='<p class="sub" style="margin-top:6px">Los cambios de rol se aplican cuando la persona sale y vuelve a entrar.</p>';
+  return h;
+}
+function usrErr(e){
+  var c=(e&&e.code)||'';
+  if(c==='auth/weak-password') return 'La contraseña es muy débil (mínimo 6 caracteres).';
+  if(c==='auth/invalid-email') return 'El email no es válido.';
+  if(c==='auth/wrong-password'||c==='auth/invalid-credential') return 'Ese email ya tiene una cuenta con otra contraseña. Escribí la contraseña que ya tiene para devolverle el acceso.';
+  if(c==='permission-denied') return 'No tenés permiso para hacer esto.';
+  if(c==='auth/network-request-failed') return 'Sin conexión a internet.';
+  return 'No se pudo completar ('+(c||'error')+').';
+}
+async function crearUsuario(btn){
+  var n=document.getElementById('u-n').value.trim(), r=document.getElementById('u-r').value;
+  var em=document.getElementById('u-e').value.trim().toLowerCase(), pw=document.getElementById('u-p').value;
+  if(!n){ toast('Escribí el nombre'); return; }
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){ toast('El email no es válido'); return; }
+  if(pw.length<6){ toast('La contraseña debe tener al menos 6 caracteres'); return; }
+  btn.disabled=true;
+  var aux=auxAuth(), nuevo;
+  try{
+    try{ nuevo=(await createUserWithEmailAndPassword(aux,em,pw)).user.uid; }
+    catch(e){
+      if(e && e.code==='auth/email-already-in-use'){ nuevo=(await signInWithEmailAndPassword(aux,em,pw)).user.uid; }
+      else throw e;
+    }
+    try{ await signOut(aux); }catch(e){}
+    await setDoc(doc(db,'usuarios',nuevo),{email:em,nombre:n,rol:r,creadoPor:me.email,creado:serverTimestamp()},{merge:true});
+    ['u-n','u-e','u-p'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
+    toast('Usuario creado: '+n);
+  }catch(e){ toast(usrErr(e)); }
+  btn.disabled=false;
+}
+
 /* ════════ RENDER ════════ */
 function render(){
   pend=false;
   renderTabs();
   var p=document.getElementById('panel');
-  p.innerHTML = ui.tab==='flota'?viewFlota():(ui.tab==='desp'?viewDesp():viewCuad());
+  p.innerHTML = ui.tab==='flota'?viewFlota():(ui.tab==='desp'?viewDesp():(ui.tab==='usr'?viewUsr():viewCuad()));
   applyRO();
   var q=document.getElementById('q');
   if(q){ q.addEventListener('input',function(){ ui.q=q.value; var pos=q.selectionStart; render(); var q2=document.getElementById('q'); q2.focus(); try{q2.setSelectionRange(pos,pos);}catch(e){} }); }
@@ -527,6 +586,10 @@ function startApp(){
     data.crews=s.docs.map(function(d){ var c=d.data(); c.id=d.id; return c; }).sort(function(a,b){ return (a.orden||0)-(b.orden||0); });
     loaded.c=true; softRender();
   },errSnap));
+  if(isAdmin) unsubs.push(onSnapshot(collection(db,'usuarios'),function(s){
+    data.users=s.docs.map(function(d){ var u=d.data(); u.id=d.id; return u; }).sort(function(a,b){ return String(a.nombre||a.email).localeCompare(String(b.nombre||b.email),'es'); });
+    softRender();
+  },errSnap));
   subDesp(); render();
 }
 onAuthStateChanged(auth,function(user){
@@ -554,7 +617,7 @@ document.addEventListener('click',function(e){
   if(t.id==='logout'||t.id==='lg-out'){ signOut(auth); return; }
   if(!me) return;
   if(t.id==='fab'){ if(isAdmin) openForm(null); return; }
-  if(t.dataset.tab){ ui.tab=t.dataset.tab; ui.delc=null; render(); window.scrollTo(0,0); return; }
+  if(t.dataset.tab){ ui.tab=t.dataset.tab; ui.delc=null; ui.delu=null; render(); window.scrollTo(0,0); return; }
   if(t.dataset.festado!==undefined){ ui.festado=t.dataset.festado; render(); return; }
   if(t.dataset.toggle){ ui.open[t.dataset.toggle]=!ui.open[t.dataset.toggle]; render(); return; }
   if(t.dataset.openall!==undefined){
@@ -613,6 +676,25 @@ document.addEventListener('click',function(e){
       if(any) run(wAsigMany(fd_,m));
     });
     run(deleteDoc(doc(db,'cuadrillas',c0))); render(); toast('Cuadrilla eliminada'); return;
+  }
+  if(t.id==='u-add'){ if(isAdmin) crearUsuario(t); return; }
+  if(t.dataset.usave){
+    if(!isAdmin) return;
+    var uu_=t.dataset.usave, nn_=(document.getElementById('un-'+uu_).value||'').trim(), rr_=document.getElementById('ur-'+uu_).value;
+    if(!nn_){ toast('El nombre no puede quedar vacío'); return; }
+    if(uu_===me.uid) rr_='admin';
+    run(setDoc(doc(db,'usuarios',uu_),{nombre:nn_,rol:rr_},{merge:true})); toast('Usuario actualizado'); return;
+  }
+  if(t.dataset.ureset!==undefined){
+    if(!isAdmin) return;
+    if(!t.dataset.ureset){ toast('Ese usuario no tiene email'); return; }
+    sendPasswordResetEmail(auth,t.dataset.ureset).then(function(){ toast('Mail enviado a '+t.dataset.ureset); }).catch(function(e){ toast(usrErr(e)); });
+    return;
+  }
+  if(t.dataset.udel){
+    if(!isAdmin || t.dataset.udel===me.uid) return;
+    if(ui.delu!==t.dataset.udel){ ui.delu=t.dataset.udel; render(); return; }
+    ui.delu=null; run(deleteDoc(doc(db,'usuarios',t.dataset.udel))); render(); toast('Acceso quitado'); return;
   }
   if(!draft) return;
   if(t.id==='sh-close'){ closeForm(); return; }

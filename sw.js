@@ -1,6 +1,6 @@
 // Service worker de Choferes: permite abrir la app sin señal.
 // Los datos (Firestore) se guardan aparte en el caché propio de Firebase.
-var CACHE = 'choferes-v1';
+var CACHE = 'choferes-v2';
 var SHELL = ['./', 'index.html', 'manifest.json', 'icon-192.png', 'icon-512.png'];
 self.addEventListener('install', function(e){
   e.waitUntil(caches.open(CACHE).then(function(c){ return c.addAll(SHELL); }).then(function(){ return self.skipWaiting(); }));
