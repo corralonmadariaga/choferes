@@ -158,7 +158,7 @@ function fdc(iso){ var p=iso.split('-'); return p[2]+'/'+p[1]; }
 
 function seed(){
   var T = hoy(), VIAL = 'Ejecución en Red Vial';
-  var crewNames = ['Emulsión','Bacheo 1','Bacheo 2','Bacheo 3','Terminadora','Fresadora','Sellado de Juntas','Albañilería','Preparación de Suelo','Relevamiento'];
+  var crewNames = ['Bacheo 1','Bacheo 2','Bacheo 3','Sellado de Juntas 1','Sellado de Juntas 2','Emulsión','Terminadora','Fresadora','Preparación Suelo 1','Preparación Suelo 2','Albañilería 1','Albañilería 2','Albañilería 3','Albañilería 4','Adoquinado','Relevamiento'];
   var crews = crewNames.map(function(n,i){ return {id:'k'+(i+1),nombre:n,dir:VIAL,orden:i+1}; });
   function U(id,tipo,codigo,unidad,marca,modelo,patente,chofer,estado,obs){ return {id:id,tipo:tipo,codigo:codigo,unidad:unidad,marca:marca,modelo:modelo,patente:patente,anio:'',horas:'',dir:VIAL,estado:estado||'Operativo',chofer:chofer||'',obs:obs||''}; }
   var units = [
@@ -295,7 +295,7 @@ function viewFlota(){
     if(q){ var hay=[u.codigo,u.unidad,u.marca,u.modelo,u.patente,u.chofer].join(' ').toLowerCase(); if(hay.indexOf(q)<0) return false; }
     return true;
   });
-  if(!us.length && !data.crews.length && isAdmin) h += '<div class="card"><div class="card-title">Flota vacía</div><p class="sub" style="margin-bottom:10px">Podés cargar la flota del relevamiento (28 unidades de Ejecución en Red Vial y 10 cuadrillas) o ir cargando unidades con el botón ➕.</p><button type="button" class="btn btn-s btn-block" id="seed">Cargar flota inicial</button></div>';
+  if(!us.length && !data.crews.length && isAdmin) h += '<div class="card"><div class="card-title">Flota vacía</div><p class="sub" style="margin-bottom:10px">Podés cargar la flota del relevamiento (28 unidades de Ejecución en Red Vial y 16 cuadrillas) o ir cargando unidades con el botón ➕.</p><button type="button" class="btn btn-s btn-block" id="seed">Cargar flota inicial</button></div>';
   if(!list.length && us.length) h += '<div class="vacio">No hay unidades con ese filtro.</div>';
   if(!us.length && !isAdmin) h += '<div class="vacio">Todavía no hay unidades cargadas.</div>';
   list.forEach(function(u){
