@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Choferes · Corralón Municipal de Lanús</title>
+<title>Automotores · Corralón Municipal de Lanús</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1a3a5c">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Choferes">
+<meta name="apple-mobile-web-app-title" content="Automotores">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icon-192.png">
 <style>
@@ -56,7 +56,7 @@ textarea{resize:vertical;}
 .grow{flex:1;min-width:0;}
 
 .badge{display:inline-block;padding:2px 9px;border-radius:12px;font-size:11.5px;font-weight:700;white-space:nowrap;}
-.b-d1{background:#dbeafe;color:#1e40af;} .b-d2{background:#e0f2fe;color:#075985;} .b-d3{background:#fef3c7;color:#92400e;} .b-d4{background:#ede9fe;color:#6d28d9;}
+.b-d1{background:#dbeafe;color:#1e40af;} .b-d2{background:#e0f2fe;color:#075985;} .b-d3{background:#fef3c7;color:#92400e;} .b-d4{background:#ede9fe;color:#6d28d9;} .b-d5{background:#d1fae5;color:#065f46;}
 .b-ok{background:#d4edda;color:#1a5c2e;} .b-taller{background:#fff3cd;color:#7a5c00;} .b-fuera{background:#fee2e2;color:#991b1b;}
 .tag{font-size:12px;color:#556;display:block;margin-top:3px;}
 .tag.hoy{color:var(--azul-m);font-weight:600;}
@@ -111,6 +111,7 @@ textarea{resize:vertical;}
 .gate{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;}
 .gcard{background:#fff;border:1px solid var(--borde);border-top:4px solid var(--naranja);border-radius:10px;padding:22px;width:100%;max-width:380px;box-shadow:0 2px 10px rgba(0,0,0,.08);display:flex;flex-direction:column;gap:12px;}
 .gcard h1{font-size:20px;color:var(--azul);}
+@media print{.top,.fab,.noprint,#toast,#modal{display:none!important} body{background:#fff} .content{padding:0;max-width:none} .card,.item{box-shadow:none;break-inside:avoid}}
 </style>
 </head>
 <body>
@@ -120,7 +121,7 @@ textarea{resize:vertical;}
 <div class="top">
   <div class="hdr">
     <div>
-      <h1>🚛 Choferes</h1>
+      <h1>🚛 Automotores</h1>
       <p id="hdr-user">Corralón Municipal de Lanús</p>
     </div>
     <div class="row"><div class="hdr-tag" id="hdr-fecha"></div><button type="button" class="btn btn-o" id="logout" style="min-height:34px;padding:0 10px;font-size:12px">Salir</button></div>
@@ -139,9 +140,9 @@ import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, creat
 import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, getFirestore, collection, doc, getDoc, onSnapshot, setDoc, deleteDoc, deleteField, writeBatch, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 (function(){
 /* ════════ DATOS BASE ════════ */
-var DIRS = ['Ejecución en Red Vial','Desagües','Herrería','Depósito'];
-var BADGE = {'Ejecución en Red Vial':'b-d1','Desagües':'b-d2','Herrería':'b-d3','Depósito':'b-d4'};
-var HEADCOL = {'Ejecución en Red Vial':'#2c5f8a','Desagües':'#0f7a99','Herrería':'#b7791f','Depósito':'#6d28d9'};
+var DIRS = ['Ejecución en Red Vial','Desagües','Herrería','Depósito','Dirección General de Obras'];
+var BADGE = {'Ejecución en Red Vial':'b-d1','Desagües':'b-d2','Herrería':'b-d3','Depósito':'b-d4','Dirección General de Obras':'b-d5'};
+var HEADCOL = {'Ejecución en Red Vial':'#2c5f8a','Desagües':'#0f7a99','Herrería':'#b7791f','Depósito':'#6d28d9','Dirección General de Obras':'#0d7a5f'};
 var ESTADOS = ['Operativo','En taller','Fuera de servicio'];
 var SUGERIDOS = ['Camioneta','Camión volcador','Camión atmosférico','Camión regador','Utilitario','Retroexcavadora','Minicargadora','Rodillo compactador','Autoelevador','Carretón'];
 var FIREBASE_CONFIG = {
@@ -264,7 +265,7 @@ function icono(u){ return u.tipo==='Maquinaria'?'🚜':(u.tipo==='Carretón'?'�
 function choferes(){ var s={}; data.units.forEach(function(u){ if(u.chofer) s[u.chofer]=1; }); Object.keys(data.desp).forEach(function(f){ Object.keys(data.desp[f]).forEach(function(k){ (data.desp[f][k]||[]).forEach(function(a){ if(a.chofer) s[a.chofer]=1; }); }); }); return Object.keys(s); }
 
 /* ════════ TABS ════════ */
-var TABS=[['flota','🚛 Flota'],['desp','📅 Despliegue'],['cuad','👥 Cuadrillas']];
+var TABS=[['flota','🚛 Flota'],['desp','📅 Despliegue'],['cuad','👥 Cuadrillas'],['inf','📄 Informe']];
 function renderTabs(){
   document.getElementById('tabs').innerHTML = TABS.concat(isAdmin?[['usr','👤 Usuarios']]:[]).map(function(t){ return '<button type="button" role="tab" class="tab" data-tab="'+t[0]+'" aria-selected="'+(ui.tab===t[0])+'">'+t[1]+'</button>'; }).join('');
   document.getElementById('hdr-fecha').textContent = fd(hoy());
@@ -487,12 +488,92 @@ async function crearUsuario(btn){
   btn.disabled=false;
 }
 
+/* ════════ PANEL: INFORME DIARIO ════════ */
+function fechaLarga(iso){ var p=iso.split('-'); var d=new Date(+p[0],+p[1]-1,+p[2]); var s=d.toLocaleDateString('es-AR',{weekday:'long'}); return s.charAt(0).toUpperCase()+s.slice(1)+' '+fd(iso); }
+function nomU(u){ return [u.codigo,u.unidad,[u.marca,u.modelo].filter(Boolean).join(' ')].filter(Boolean).join(' '); }
+function lineaU(u,a,otros){
+  var s=icono(u)+' '+nomU(u);
+  if(u.patente) s+=' · '+u.patente;
+  if(a && a.chofer) s+=' — '+a.chofer;
+  if(otros && otros.length) s+=' 🔁 (también: '+otros.map(function(x){ return nombreCorto(x.dest); }).join(', ')+')';
+  return s;
+}
+function infDatos(f){
+  var us=data.units;
+  function as(u){ return asigs(f,u.id); }
+  var op=us.filter(function(u){ return u.estado==='Operativo'; });
+  var r={ total:us.length, op:op.length,
+    taller:us.filter(function(u){ return u.estado==='En taller'; }).length,
+    fuera:us.filter(function(u){ return u.estado==='Fuera de servicio'; }).length,
+    desp:us.filter(function(u){ return as(u).length; }).length,
+    comp:us.filter(function(u){ return as(u).length>1; }).length,
+    libres:op.filter(function(u){ return !as(u).length; }),
+    noop:us.filter(function(u){ return u.estado!=='Operativo'; }), dirs:[] };
+  DIRS.forEach(function(d){
+    var bloques=[];
+    var dests=data.crews.filter(function(c){ return c.dir===d; }).map(function(c){ return {dest:'crew:'+c.id,nombre:'Cuadrilla '+c.nombre}; }).concat([{dest:'dir:'+d,nombre:'General'}]);
+    dests.forEach(function(x){
+      var l=[];
+      us.forEach(function(u){ as(u).forEach(function(a){ if(a.dest===x.dest) l.push({u:u,a:a,otros:as(u).filter(function(y){ return y!==a; })}); }); });
+      l.sort(function(p,q){ return ORD[p.u.tipo]-ORD[q.u.tipo]; });
+      if(l.length) bloques.push({nombre:x.nombre,items:l});
+    });
+    if(bloques.length) r.dirs.push({dir:d,bloques:bloques});
+  });
+  return r;
+}
+function infTexto(f){
+  var r=infDatos(f), t='🚛 *INFORME DIARIO DE AUTOMOTORES*\n🗓️ '+fechaLarga(f)+'\n'+'═'.repeat(30)+'\n\n';
+  t+='*RESUMEN*\nFlota: '+r.total+' · Operativas: '+r.op+' · En taller: '+r.taller+' · Fuera de servicio: '+r.fuera+'\nDesplegadas: '+r.desp+' · Compartidas: '+r.comp+' · Sin asignar: '+r.libres.length+'\n\n';
+  if(!r.dirs.length) t+='Sin despliegue cargado para esta fecha.\n\n';
+  r.dirs.forEach(function(d){
+    t+='*'+d.dir.toUpperCase()+'*\n';
+    d.bloques.forEach(function(bq){ t+='▪️ '+bq.nombre+' ('+bq.items.length+')\n'; bq.items.forEach(function(e){ t+='   '+lineaU(e.u,e.a,e.otros)+'\n'; }); });
+    t+='\n';
+  });
+  if(r.libres.length){ t+='*OPERATIVAS SIN ASIGNAR*\n'; r.libres.forEach(function(u){ t+='   '+lineaU(u)+'\n'; }); t+='\n'; }
+  if(r.noop.length){ t+='*NO OPERATIVAS*\n'; r.noop.forEach(function(u){ t+='   🔧 '+nomU(u)+(u.patente?' · '+u.patente:'')+' — '+u.estado+(u.obs?': '+u.obs:'')+'\n'; }); }
+  return t.replace(/\s+$/,'');
+}
+function viewInf(){
+  if(!loaded.u||!loaded.c) return '<div class="vacio">Cargando…</div>';
+  var f=ui.fecha, r=infDatos(f);
+  function st(n,l,c){ return '<div class="stat"><div class="n"'+(c?' style="color:'+c+'"':'')+'>'+n+'</div><div class="l">'+l+'</div></div>'; }
+  var h='<div class="card noprint"><div class="card-title">📄 Informe diario</div>'
+    +'<div class="datebar"><button type="button" class="btn btn-o" data-day="-1" aria-label="Día anterior">◀</button><input type="date" id="fecha" value="'+f+'" aria-label="Fecha"><button type="button" class="btn btn-o" data-day="1" aria-label="Día siguiente">▶</button></div>'
+    +'<div class="row wrap"><button type="button" class="btn btn-s grow" id="inf-copy">📲 Copiar para WhatsApp</button><button type="button" class="btn btn-o grow" id="inf-print">🖨️ Imprimir / PDF</button></div></div>';
+  h+='<h2 style="font-size:16px;color:var(--azul);margin:4px 2px 10px">Informe diario de automotores · '+esc(fechaLarga(f))+'</h2>';
+  h+='<div class="stats" style="grid-template-columns:repeat(3,1fr)">'+st(r.total,'Flota')+st(r.op,'Operativas','#2d6a4f')+st(r.taller+r.fuera,'No operativas','#b7791f')+'</div>';
+  h+='<div class="stats" style="grid-template-columns:repeat(3,1fr)">'+st(r.desp,'Desplegadas','#2d6a4f')+st(r.comp,'Compartidas','#8a5a00')+st(r.libres.length,'Sin asignar','#2c5f8a')+'</div>';
+  if(!r.dirs.length) h+='<div class="vacio">Sin despliegue cargado para esta fecha.</div>';
+  r.dirs.forEach(function(d){
+    h+='<div class="sec-head" style="background:'+HEADCOL[d.dir]+'"><span>'+esc(d.dir.toUpperCase())+'</span><span>'+d.bloques.reduce(function(n,bq){ return n+bq.items.length; },0)+' unidades</span></div>';
+    d.bloques.forEach(function(bq){
+      h+='<div class="item"><b>'+esc(bq.nombre)+'</b> <span class="sub">· '+bq.items.length+(bq.items.length===1?' unidad':' unidades')+'</span>'
+        +bq.items.map(function(e){ return '<div class="sub" style="margin-top:4px">'+esc(lineaU(e.u,e.a,e.otros))+'</div>'; }).join('')+'</div>';
+    });
+  });
+  if(r.libres.length){
+    h+='<div class="sec-head" style="background:#2c5f8a"><span>SIN ASIGNAR</span><span>'+r.libres.length+'</span></div>';
+    h+='<div class="item">'+r.libres.map(function(u){ return '<div class="sub">'+esc(lineaU(u))+'</div>'; }).join('')+'</div>';
+  }
+  if(r.noop.length){
+    h+='<div class="sec-head" style="background:#b7791f"><span>🔧 NO OPERATIVAS</span><span>'+r.noop.length+'</span></div>';
+    r.noop.forEach(function(u){ h+='<div class="item"><b>'+esc(nomU(u))+'</b> <span class="badge '+estCls(u.estado)+'">'+esc(u.estado)+'</span>'+(u.obs?'<div class="sub">'+esc(u.obs)+'</div>':'')+'</div>'; });
+  }
+  return h;
+}
+function copiarTexto(txt,msg){
+  function fb(){ var ta=document.createElement('textarea'); ta.value=txt; document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); }catch(e){} document.body.removeChild(ta); toast(msg); }
+  if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(function(){ toast(msg); }).catch(fb); } else fb();
+}
+
 /* ════════ RENDER ════════ */
 function render(){
   pend=false;
   renderTabs();
   var p=document.getElementById('panel');
-  p.innerHTML = ui.tab==='flota'?viewFlota():(ui.tab==='desp'?viewDesp():(ui.tab==='usr'?viewUsr():viewCuad()));
+  p.innerHTML = ui.tab==='flota'?viewFlota():(ui.tab==='desp'?viewDesp():(ui.tab==='usr'?viewUsr():(ui.tab==='inf'?viewInf():viewCuad())));
   applyRO();
   var q=document.getElementById('q');
   if(q){ q.addEventListener('input',function(){ ui.q=q.value; var pos=q.selectionStart; render(); var q2=document.getElementById('q'); q2.focus(); try{q2.setSelectionRange(pos,pos);}catch(e){} }); }
@@ -555,7 +636,7 @@ function showGate(h){
   g.innerHTML='<div class="gcard">'+h+'</div>';
 }
 function showLogin(msg){
-  showGate('<div><h1>🚛 Choferes</h1><p class="sub">Corralón Municipal de Lanús</p></div>'
+  showGate('<div><h1>🚛 Automotores</h1><p class="sub">Corralón Municipal de Lanús</p></div>'
     +'<form id="lf" style="display:flex;flex-direction:column;gap:12px">'
     +'<div><label for="lg-e">Email</label><input type="email" id="lg-e" autocomplete="username" inputmode="email" autocapitalize="none"></div>'
     +'<div><label for="lg-p">Contraseña</label><input type="password" id="lg-p" autocomplete="current-password"></div>'
@@ -563,7 +644,7 @@ function showLogin(msg){
     +'<button type="submit" class="btn btn-p btn-block" id="lg-b" style="min-height:50px">Ingresar</button></form>');
 }
 function showNoAccess(user,err){
-  showGate('<div><h1>🚛 Choferes</h1><p class="sub">'+esc(user.email||'')+'</p></div>'
+  showGate('<div><h1>🚛 Automotores</h1><p class="sub">'+esc(user.email||'')+'</p></div>'
     +'<div class="err" role="alert">'+(err?'No se pudo verificar tu acceso ('+esc(err.code||'error')+').':'Tu usuario todavía no tiene permisos en este sistema. Pedile al administrador que te habilite.')+'</div>'
     +'<button type="button" class="btn btn-o btn-block" id="lg-out">Salir</button>');
 }
@@ -677,6 +758,8 @@ document.addEventListener('click',function(e){
     });
     run(deleteDoc(doc(db,'cuadrillas',c0))); render(); toast('Cuadrilla eliminada'); return;
   }
+  if(t.id==='inf-copy'){ copiarTexto(infTexto(ui.fecha),'Informe copiado — pegalo en WhatsApp'); return; }
+  if(t.id==='inf-print'){ window.print(); return; }
   if(t.id==='u-add'){ if(isAdmin) crearUsuario(t); return; }
   if(t.dataset.usave){
     if(!isAdmin) return;
